@@ -21,9 +21,7 @@ def getUserById(user_id: str):
                 "message": "succes", 
                 "user": user
             }
-    return {
-        "message": "failed, user not found",
-    }
+    raise HTTPException(status_code=404, detail=f"User({user_id}) Not Found")
 
 @app.post('/api/user')
 def createUser(user: User):
@@ -44,19 +42,14 @@ def updateUser(user_updated: User, user_id: str):
                 "message": "succes", 
                 "user": user
             }
-    return {
-        "message": "failed, user not found",
-    }
+    raise HTTPException(status_code=404, detail=f"User({user_id}) Not Found")
     
 @app.delete('/api/user/{user_id}')
 def deleteUser(user_id: str):
-    for user in users:
+    for idx,user in enumerate(users):
         if user['id'] == user_id:
-            users.remove(user)
             return {
                 "message": "succes", 
-                "user": user
+                "user": users.pop(idx)
             }
-    return {
-        "message": "failed, user not found",
-    }
+    raise HTTPException(status_code=404, detail=f"User({user_id}) Not Found")
