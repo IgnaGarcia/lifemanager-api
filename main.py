@@ -1,11 +1,18 @@
 from fastapi import FastAPI
+
 from user.router import users
+from auth.router import auth
+
 from database.db import engine
 from database import schemas
 
 schemas.Base.metadata.create_all(bind= engine)
         
 tags_metadata = [
+    {
+        "name": "Auth", 
+        "description": "Authorization operations."
+    },
     {
         "name": "Users", 
         "description": "Operations with Users."
@@ -30,6 +37,10 @@ app = FastAPI(
 )
   
    
+app.include_router(auth, 
+    prefix= '/auth', 
+    tags= ["Auth"]
+    )
 app.include_router(users, 
     prefix= '/users', 
     tags= ["Users"], 

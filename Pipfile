@@ -20,6 +20,7 @@ sqlalchemy = "*"
 pymysql = "*"
 passlib = "*"
 bcrypt = "*"
+python-jose = "*"
 
 [dev-packages]
 
