@@ -1,6 +1,17 @@
 from fastapi import FastAPI
 from user.router import users
+from database.db import SessionLocal, engine
+from database import schemas
 
+schemas.Base.metadata.create_all(bind= engine)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        
+        
 tags_metadata = [
     {
         "name": "Base", 
@@ -11,7 +22,6 @@ tags_metadata = [
         "description": "Operations with Users."
     }
 ]
-
 app = FastAPI(
     title = "First API", 
     description = "Firt API with FastAPI.", 

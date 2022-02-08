@@ -16,6 +16,8 @@ sniffio = "==1.2.0"
 starlette = "==0.17.1"
 typing-extensions = "==4.0.1"
 uvicorn = "==0.17.3"
+sqlalchemy = "*"
+pymysql = "*"
 
 [dev-packages]
 
