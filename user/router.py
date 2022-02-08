@@ -1,40 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from uuid import uuid4
 from sqlalchemy.orm import Session
 
 from user.model import User, UserUpdateReq, Role
 from database.schemas import Users
-from database.db import SessionLocal, engine
+from database.db import get_db, engine
 
 
-users = APIRouter()
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-        
-responses = {
-    403: {"detail": "Not enough privileges"},
-    404: {"detail": "Item not found"},
-    500: {"detail": "Internal Server Error"}
-}
+users = APIRouter()        
 
 
-@users.get('/api/users', tags=["Users"],
-           status_code=200,
-           response_model=List[User],
-           summary="Retrieve all Users",
+@users.get('/', summary="Retrieve all Users",
+           status_code=200, response_model=List[User],
            responses={
-               **responses,
                200: {
                    "detail": "Successful Response",
                    "content": {"application/json": {}}
                }
-}
-)
+})
 async def list_users(db: Session = Depends(get_db)):
     """
     Fetch all user from DB and return.
@@ -42,36 +26,30 @@ async def list_users(db: Session = Depends(get_db)):
     return db.query(Users).all()
 
 
-@users.get('/api/users/{user_id}', tags=["Users"],
-           status_code=200,
-           response_model=User,
-           summary="Find User by User UUID",
+@users.get('/{id}', summary="Find User by User UUID",
+           status_code=200, response_model=User,
            responses={
-               **responses,
                200: {
                    "detail": "Successful Response",
                    "content": {"application/json": {}}
                }
 })
-async def get_user_by_id(user_id: str, db: Session = Depends(get_db)):
+async def get_user_by_id(id: str, db: Session = Depends(get_db)):
     """
     Fetch user of this UUID and return. 
     If not exists throw 404 error.
 
     - **user_id**: id of user to find
     """
-    user = db.query(Users).filter(Users.uuid == user_id).first()
+    user = db.query(Users).filter(Users.uuid == id).first()
     if not user:
-        raise HTTPException(status_code= 404, detail= f'User {user_id} not found')
+        raise HTTPException(status_code= 404, detail= f'User {id} not found')
     return user
 
 
-@users.post('/api/users', tags=["Users"],
-            status_code=201,
-            response_model=User,
-            summary="Create new User",
+@users.post('/', summary="Create new User",
+            status_code=201, response_model=User,
             responses={
-                **responses,
                 201: {
                     "detail": "Created Successfully",
                     "content": {"application/json": {}}
@@ -93,18 +71,15 @@ async def create_user(user: User, db: Session = Depends(get_db)):
     return new_user
 
 
-@users.put('/api/users/{user_id}', tags=["Users"],
-           status_code=200,
-           response_model=User,
-           summary="Change values of User by UUID",
+@users.put('/{id}', summary="Change values of User by UUID",
+           status_code=200, response_model=User,
            responses={
-               **responses,
                200: {
                    "detail": "Successful Response",
                    "content": {"application/json": {}}
                }
 })
-async def update_user(user_updt: UserUpdateReq, user_id: str, db: Session = Depends(get_db)):
+async def update_user(user_updt: UserUpdateReq, id: str, db: Session = Depends(get_db)):
     """
     Fetch user of this UUID, change his values and save to DB, the user updated are returned. 
     If not exists throw 404 error.
@@ -115,9 +90,9 @@ async def update_user(user_updt: UserUpdateReq, user_id: str, db: Session = Depe
     - **age**: age of the user
     - **role**: [admin, user]
     """
-    user = db.query(Users).filter(Users.uuid == user_id)
+    user = db.query(Users).filter(Users.uuid == id)
     if not user.first():
-        raise HTTPException(status_code= 404, detail= f'User {user_id} not found')
+        raise HTTPException(status_code= 404, detail= f'User {id} not found')
     
     query = {}
     if user_updt.name is not None:
@@ -132,12 +107,9 @@ async def update_user(user_updt: UserUpdateReq, user_id: str, db: Session = Depe
     return user
 
 
-@users.delete('/api/users/{user_id}', tags=["Users"],
+@users.delete('/{id}', summary="Delete User by UUID",
               status_code=200,
-              response_model=User,
-              summary="Delete User by UUID",
               responses={
-                  **responses,
                   200: {
                       "detail": "Successful Response",
                       "content": {"application/json": {}}
@@ -150,9 +122,9 @@ async def delete_user(user_id: str, db: Session = Depends(get_db)):
 
     - **user_id**: id of user to delete
     """
-    user = db.query(Users).filter(Users.uuid == user_id)
-    if not user: 
-        raise HTTPException(status_code= 404, detail= f'User {user_id} not found')
+    user = db.query(Users).filter(Users.uuid == id)
+    if not user.first(): 
+        raise HTTPException(status_code= 404, detail= f'User {id} not found')
     user.delete(synchronize_session=False)        
     db.commit()
-    return user
+    return "ok"

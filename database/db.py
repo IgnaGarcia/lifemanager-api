@@ -12,3 +12,11 @@ engine = engine('localhost', 3306, 'life_manager_dev')
 SessionLocal = sessionmaker(bind=engine)
 
 Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        

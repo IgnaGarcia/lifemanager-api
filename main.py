@@ -1,27 +1,22 @@
 from fastapi import FastAPI
 from user.router import users
-from database.db import SessionLocal, engine
+from database.db import engine
 from database import schemas
 
 schemas.Base.metadata.create_all(bind= engine)
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-        
         
 tags_metadata = [
-    {
-        "name": "Base", 
-        "description": "Base Operations of API."
-    },
     {
         "name": "Users", 
         "description": "Operations with Users."
     }
 ]
+responses = {
+    403: {"detail": "Not enough privileges"},
+    500: {"detail": "Internal Server Error"}
+} 
+
+
 app = FastAPI(
     title = "First API", 
     description = "Firt API with FastAPI.", 
@@ -33,13 +28,12 @@ app = FastAPI(
     openapi_tags = tags_metadata, 
     redoc_url = None
 )
-
-
-@app.get('/', tags = ["Base"])
-async def root():
-    return {
-        "api": "/api", 
-        "docs": "/docs"
-    }
-    
-app.include_router(users)
+  
+   
+app.include_router(users, 
+    prefix= '/users', 
+    tags= ["Users"], 
+    responses = {
+        **responses,
+        404: {"detail": "User not found"}
+    })
