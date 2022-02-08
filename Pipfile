@@ -11,13 +11,15 @@ colorama = "==0.4.4"
 fastapi = "==0.73.0"
 h11 = "==0.13.0"
 idna = "==3.3"
-pydantic = "==1.9.0"
+pydantic = {extras = ["email"], version = "*"}
 sniffio = "==1.2.0"
 starlette = "==0.17.1"
 typing-extensions = "==4.0.1"
 uvicorn = "==0.17.3"
 sqlalchemy = "*"
 pymysql = "*"
+passlib = "*"
+bcrypt = "*"
 
 [dev-packages]
 

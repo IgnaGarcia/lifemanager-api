@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import List
 from sqlalchemy.orm import Session
 
-from user.model import User, UserUpdateReq
+from user.model import User, UserBase, UserUpdateReq
 from database.db import get_db
 from user import repository
 
@@ -10,7 +10,7 @@ users = APIRouter()
 
 
 @users.get('/', summary="Retrieve all Users",
-           status_code=200, response_model=List[User],
+           status_code=200, response_model=List[UserBase],
            responses={
                200: {
                    "detail": "Successful Response",
@@ -25,7 +25,7 @@ async def list_users(db: Session = Depends(get_db)):
 
 
 @users.get('/{id}', summary="Find User by User UUID",
-           status_code=200, response_model=User,
+           status_code=200, response_model=UserBase,
            responses={
                200: {
                    "detail": "Successful Response",
@@ -43,7 +43,7 @@ async def get_user_by_id(id: str, db: Session = Depends(get_db)):
 
 
 @users.post('/', summary="Create new User",
-            status_code=201, response_model=User,
+            status_code=201, response_model=UserBase,
             responses={
                 201: {
                     "detail": "Created Successfully",
@@ -55,6 +55,8 @@ async def create_user(user: User, db: Session = Depends(get_db)):
     Create an user with passed data, create his UUID and save to DB.
 
     - **name**: each user must have a name
+    - **email**: unique, used to login
+    - **password**: secret, used to login
     - **age**: age of the user
     - **role**: [admin, user]
     """
@@ -62,7 +64,7 @@ async def create_user(user: User, db: Session = Depends(get_db)):
 
 
 @users.put('/{id}', summary="Change values of User by UUID",
-           status_code=200, response_model=User,
+           status_code=200, response_model=UserBase,
            responses={
                200: {
                    "detail": "Successful Response",
