@@ -22,5 +22,4 @@ class UserUpdateReq(BaseModel):
     name: Optional[str]
     password: Optional[str]
     age: Optional[int]
-    role: Optional[Role]
     

@@ -65,12 +65,9 @@ async def create_user(user: User, db: Session = Depends(get_db)):
 
 
 @users.put('/{id}', summary="Change values of User by UUID",
-           status_code=200, response_model=UserBase,
+           status_code=200,
            responses={
-               200: {
-                   "detail": "Successful Response",
-                   "content": {"application/json": {}}
-               }
+               200: { "detail": "Successful Response" }
 })
 async def update_user(user_updt: UserUpdateReq, id: str, db: Session = Depends(get_db), current_user= Depends(current_user)):
     """
@@ -89,10 +86,7 @@ async def update_user(user_updt: UserUpdateReq, id: str, db: Session = Depends(g
 @users.delete('/{id}', summary="Delete User by UUID",
               status_code=200,
               responses={
-                  200: {
-                      "detail": "Successful Response",
-                      "content": {"application/json": {}}
-                    }
+                  200: { "detail": "Successful Response" }
 })
 async def delete_user(id: str, db: Session = Depends(get_db), admin= Depends(current_admin)):
     """

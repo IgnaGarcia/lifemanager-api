@@ -45,13 +45,9 @@ def update(user_updt: UserUpdateReq, id: str, db: Session, current_user):
         query['password'] = Hash.hash(user_updt.password)
     if user_updt.age is not None:
         query['age'] = user_updt.age
-    if user_updt.role is not None:
-        query['role'] = user_updt.role
-        
     user.update(query)
     db.commit()
-    return user
-    return ""
+    return "ok"
 
 
 def delete(id: str, db: Session):
