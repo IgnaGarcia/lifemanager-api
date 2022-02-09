@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from user.model import User, UserBase, UserUpdateReq
 from database.db import get_db
 from user import repository
+from auth.token import current_user, current_admin
 
 users = APIRouter()        
 
@@ -17,7 +18,7 @@ users = APIRouter()
                    "content": {"application/json": {}}
                }
 })
-async def list_users(db: Session = Depends(get_db)):
+async def list_users(db: Session = Depends(get_db), admin= Depends(current_admin)):
     """
     Fetch all user from DB and return.
     """
@@ -71,7 +72,7 @@ async def create_user(user: User, db: Session = Depends(get_db)):
                    "content": {"application/json": {}}
                }
 })
-async def update_user(user_updt: UserUpdateReq, id: str, db: Session = Depends(get_db)):
+async def update_user(user_updt: UserUpdateReq, id: str, db: Session = Depends(get_db), current_user= Depends(current_user)):
     """
     Fetch user of this UUID, change his values and save to DB, the user updated are returned. 
     If not exists throw 404 error.
@@ -82,7 +83,7 @@ async def update_user(user_updt: UserUpdateReq, id: str, db: Session = Depends(g
     - **age**: age of the user
     - **role**: [admin, user]
     """
-    return repository.update(user_updt, id, db)
+    return repository.update(user_updt, id, db, current_user)
 
 
 @users.delete('/{id}', summary="Delete User by UUID",
@@ -93,7 +94,7 @@ async def update_user(user_updt: UserUpdateReq, id: str, db: Session = Depends(g
                       "content": {"application/json": {}}
                     }
 })
-async def delete_user(id: str, db: Session = Depends(get_db)):
+async def delete_user(id: str, db: Session = Depends(get_db), admin= Depends(current_admin)):
     """
     Delete user of this UUID from DB, the user deleted are returned. 
     If not exists throw 404 error.

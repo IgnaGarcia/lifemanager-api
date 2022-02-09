@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from uuid import uuid4
 from database.schemas import Users
-from user.model import User, UserUpdateReq
+from user.model import User, UserUpdateReq, Role
 from util.hash import Hash
 
 
@@ -30,7 +30,10 @@ def find(id: str, db: Session):
     return user
 
 
-def update(user_updt: UserUpdateReq, id: str, db: Session):
+def update(user_updt: UserUpdateReq, id: str, db: Session, current_user):
+    if current_user.uuid != id and current_user.role != Role.ADMIN:
+        raise HTTPException(status_code= 403,detail= "Not enough privileges")
+        
     user = db.query(Users).filter(Users.uuid == id)
     if not user.first():
         raise HTTPException(status_code= 404, detail= f'User {id} not found')

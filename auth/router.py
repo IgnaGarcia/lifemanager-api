@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordRequestForm
 
-from auth.model import LoginReq
 from auth.token import Token
 from database.db import get_db
 from auth import repository
@@ -20,7 +20,7 @@ auth = APIRouter()
                     "detail": "Invalid credentials"
                 }
 })
-async def login(req: LoginReq, db: Session = Depends(get_db)):
+async def login(req: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """
     Send email and password to login and retrieve token
     """
