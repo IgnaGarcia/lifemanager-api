@@ -23,15 +23,17 @@ responses = {
     500: {"detail": "Internal Server Error"}
 } 
 
-
-app = FastAPI(
-    title = "First API", 
-    description = "Firt API with FastAPI.", 
-    contact = {
+apiInfo = {
+    "title": "First API", 
+    "description": "Firt API with FastAPI.", 
+    "contact": {
         "name": "Igna Garcia", 
         "url": "https://ignagarcia.vercel.app/", 
         "email": "gnachoxp@gmail.com"
-    }, 
+    }
+}
+app = FastAPI(
+    **apiInfo, 
     openapi_tags = tags_metadata, 
     redoc_url = None
 )
@@ -48,3 +50,10 @@ app.include_router(users,
         **responses,
         404: {"detail": "User not found"}
     })
+
+@app.get('/', summary="Initial endpoint", status_code=200)
+async def base():
+    """
+    Ping api and return basic info.
+    """
+    return {"docs": '/docs', "info": apiInfo}
